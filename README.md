@@ -12,9 +12,9 @@ Usage:
 ------
 
 ```bash
-nix-cert -h                                               Display this help message.
-nix-cert cert -c <configuration> [-o <certs>]             Generate certs.
-nix-cert ovpn -c <configuration> -n <name> [-o <certs>]   Generate ovpn files.
+nixrsa -h                                               Display this help message.
+nixrsa cert -c <configuration> [-o <certs>]             Generate certs.
+nixrsa ovpn -c <configuration> -n <name> [-o <certs>]   Generate ovpn files.
 ```
 
 Tutorial:

@@ -6,9 +6,9 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 function usage() {
     echo "Usage:"
-    echo "    nix-cert -h                                               Display this help message."
-    echo "    nix-cert cert -c <configuration> [-o <certs>]             Generate certs."
-    echo "    nix-cert ovpn -c <configuration> -n <name> [-o <certs>]   Generate ovpn files."
+    echo "    nixrsa -h                                               Display this help message."
+    echo "    nixrsa cert -c <configuration> [-o <certs>]             Generate certs."
+    echo "    nixrsa ovpn -c <configuration> -n <name> [-o <certs>]   Generate ovpn files."
 }
 
 # Parse options to the `nix-cert` command
