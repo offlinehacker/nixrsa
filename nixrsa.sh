@@ -3,12 +3,13 @@
 set -e
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+GPG=$(command -v gpg 2>&1 || command -v gpg2 2>&1 || { echo >&2 "GPG not found!"; exit 1; })
 
 function usage() {
     echo "Usage:"
-    echo "    nixrsa -h                                               Display this help message."
-    echo "    nixrsa cert -c <configuration> [-o <certs>]             Generate certs."
-    echo "    nixrsa ovpn -c <configuration> -n <name> [-o <certs>]   Generate ovpn files."
+    echo "    nixrsa -h                                                    Display this help message."
+    echo "    nixrsa cert -c <configuration> [-o <certs>]                  Generate certs."
+    echo "    nixrsa ovpn -c <configuration> -n <name> [-e] [-o <certs>]   Generate ovpn files."
 }
 
 # Parse options to the `nix-cert` command
@@ -58,7 +59,7 @@ case "$subcommand" in
     action="ovpn"
 
     # Process package options
-    while getopts "c:o:n:" opt; do
+    while getopts "c:o:n:e" opt; do
       case ${opt} in
         c )
           configuration=$OPTARG
@@ -68,6 +69,9 @@ case "$subcommand" in
           ;;
         n )
           name=$OPTARG
+          ;;
+        e )
+          encrypt=true
           ;;
         \? )
           echo "Invalid Option: -$OPTARG" 1>&2
@@ -98,6 +102,10 @@ fi
 
 shift
 
+function getnixopt() {
+  echo $(nix-instantiate --eval --argstr configuration $(readlink -f $1) -A $2)
+}
+
 if [ -z "$out" ]; then out="ca"; fi
 case "$action" in
   # Parse options to the install sub command
@@ -120,7 +128,14 @@ case "$action" in
     nix-build $DIR/default.nix -A ovpn \
        --argstr configuration $(readlink -f $configuration) \
        --argstr name $name "$@"
-    cp -f result $name.ovpn
+
+    if [ "$encrypt" = true ]; then
+      KEY=$(getnixopt $configuration "config.certs.nodes.$name.gpg")
+      echo "Encrypting with key $KEY"
+      $GPG --output $name.ovpn.gpg --encrypt --recipient "${KEY//\"}" result
+    else
+      cp -f result $name.ovpn
+    fi
     path=$(readlink -f result) && rm result && nix-store --delete $path
   ;;
 esac

@@ -83,6 +83,12 @@ in {
             default = cfg.email;
             type = types.str;
           };
+
+          gpg = mkOption {
+            description = "GPG key id to use to for encryption of files";
+            default = "";
+            type = types.str;
+          };
         };
       })];
       default = [];

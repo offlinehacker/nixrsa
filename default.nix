@@ -124,4 +124,6 @@ in {
       substituteInPlace $out --replace INSERT_CLIENT_KEY "$(< $src/${cfg.cname}.key)"
     '';
   };
+
+  inherit config;
 }
